@@ -1,7 +1,7 @@
 /* QNT CUP — somente apresentação. O controle é em /controle, nunca nesta tela. */
 (() => {
   const isBreak = document.body.classList.contains('interval');
-  let state = null, seenRevision = -1;
+  let state = null, seenRevision = -1, clockOffset = 0;
   const $ = (id) => document.getElementById(id);
   const text = (id,value) => {const el=$(id); if(el)el.textContent=String(value ?? '');};
   const logo = (target,src,tag,large=false) => {
@@ -115,7 +115,7 @@
   }
   function tick(){
     if(!state || isBreak)return;
-    const now=Date.now(),g=state.graphics||{};
+    const now=Date.now()+clockOffset,g=state.graphics||{};
     setGraphicVisible('intro',Number(g.introUntil||0)>now);
     setGraphicVisible('mvp',Number(g.mvpUntil||0)>now);
     const bug=$('bug');
@@ -141,8 +141,15 @@
     if(isPolling)return;
     isPolling=true;
     try{
+      const t0=Date.now();
       const r=await fetch('/api/state',{cache:'no-store'});
       if(!r.ok)throw Error('Offline');
+      const serverTime=Number(r.headers.get('x-server-time'));
+      if(serverTime){
+        // Sincroniza com o relógio do servidor: banners não dependem da hora do PC do OBS.
+        clockOffset=serverTime-(t0+Date.now())/2;
+        if(Math.abs(clockOffset)>2000)console.warn('[QNT CUP overlay] Relógio deste PC difere do servidor em '+Math.round(clockOffset/1000)+'s (corrigido automaticamente).');
+      }
       const d=await r.json();
       if(d.revision!==seenRevision){render(d);seenRevision=d.revision}
       // Evaluate graphic timers on every successful state read.

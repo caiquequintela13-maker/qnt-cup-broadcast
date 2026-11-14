@@ -154,7 +154,7 @@ async function handler(req,res){
       return send(res,200,{ok:true},"application/json; charset=utf-8",{"Set-Cookie":`qnt_session=${newToken()}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=604800`});
     }
     if(route==="logout"&&req.method==="POST")return send(res,200,{ok:true},"application/json; charset=utf-8",{"Set-Cookie":"qnt_session=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0"});
-    if(route==="state"&&req.method==="GET")return send(res,200,await getState());
+    if(route==="state"&&req.method==="GET")return send(res,200,await getState(),"application/json; charset=utf-8",{"X-Server-Time":String(Date.now())});
     if(route==="veto/view"&&req.method==="GET"){const state=await getState();return send(res,200,vetoView(state.veto||freshVeto()));}
     if(route==="state"&&req.method==="POST"){
       if(!isAuthorized(req))return fail(res,401,"Acesso administrativo: entre novamente.");
