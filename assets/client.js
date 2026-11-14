@@ -95,11 +95,29 @@
     state=d;
     if(isBreak) renderBreak(d); else renderGame(d);
   }
+  function setGraphicVisible(id, active){
+    const el=$(id);
+    if(!el)return;
+    el.classList.toggle('show',active);
+    // Fallback inline styles: keeps the graphic visible even if a CSS rule
+    // from another layout overrides the .show selector.
+    if(active){
+      el.style.setProperty('display','block','important');
+      el.style.setProperty('visibility','visible','important');
+      el.style.setProperty('opacity','1','important');
+      el.style.setProperty('z-index','9999','important');
+    }else{
+      el.style.removeProperty('display');
+      el.style.removeProperty('visibility');
+      el.style.removeProperty('opacity');
+      el.style.removeProperty('z-index');
+    }
+  }
   function tick(){
     if(!state || isBreak)return;
-    const now=Date.now(),g=state.graphics;
-    $('intro').classList.toggle('show',g.introUntil>now);
-    $('mvp').classList.toggle('show',g.mvpUntil>now);
+    const now=Date.now(),g=state.graphics||{};
+    setGraphicVisible('intro',Number(g.introUntil||0)>now);
+    setGraphicVisible('mvp',Number(g.mvpUntil||0)>now);
     const bug=$('bug');
     if(!state.settings.sponsorBug){bug.style.display='none';return}
     const sponsors=state.sponsors.filter(x=>x.logo||x.name);
@@ -126,8 +144,10 @@
       const r=await fetch('/api/state',{cache:'no-store'});
       if(!r.ok)throw Error('Offline');
       const d=await r.json();
-      if(d.revision!==seenRevision){render(d);seenRevision=d.revision;tick()}
-    }catch(e){ }
+      if(d.revision!==seenRevision){render(d);seenRevision=d.revision}
+      // Evaluate graphic timers on every successful state read.
+      tick();
+    }catch(e){ console.error('[QNT CUP overlay] Falha ao atualizar estado:',e); }
     finally{isPolling=false}
   }
   poll();setInterval(poll,550);setInterval(tick,180);

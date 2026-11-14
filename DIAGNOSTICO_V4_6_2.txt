@@ -1,0 +1,15 @@
+QNT CUP BROADCAST V4.6.2 — DIAGNÓSTICO E CORREÇÃO DOS BANNERS
+
+Alterações:
+- A leitura dos timers gráficos é feita após cada resposta bem-sucedida de /api/state.
+- O overlay aplica visibilidade inline como fallback, além da classe CSS .show.
+- Erros de atualização deixam de ser silenciosos e aparecem no Console do navegador.
+- overlay.html usa query strings v=4.6.2 para evitar cache antigo de CSS/JavaScript.
+
+Publicação:
+1. Faça backup do projeto e do banco.
+2. Substitua os arquivos pelo conteúdo deste ZIP no mesmo repositório conectado à Vercel.
+3. Faça Deploy.
+4. Abra /overlay?v=4.6.2 em uma nova aba ou atualize com Ctrl+Shift+R.
+5. Teste os banners. Se não aparecer, abra F12 > Console e envie a mensagem vermelha que começar com [QNT CUP overlay].
+Não altere variáveis de ambiente nem execute novamente a migração do Supabase.
