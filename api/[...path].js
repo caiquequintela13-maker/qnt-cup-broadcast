@@ -167,9 +167,17 @@ async function handler(req,res){
     }
     if(route==="trigger"&&req.method==="POST"){
       if(!isAuthorized(req))return fail(res,401,"Acesso administrativo: entre novamente.");
-      const data=await bodyJson(req),action=data.action;if(!["intro","mvp","hideIntro","hideMvp"].includes(action))return fail(res,400,"Ação inválida.");
-      const state=await getState(),duration=action==="intro"?8500:10000,key=action.toLowerCase().endsWith("intro")?"introUntil":"mvpUntil";
-      state.graphics[key]=action.startsWith("hide")?0:Date.now()+duration;state.revision=Number(state.revision||1)+1;await putState(state);return send(res,200,state);
+      const data=await bodyJson(req),action=data.action;
+      if(!["intro","mvp","hideIntro","hideMvp"].includes(action))return fail(res,400,"Ação inválida.");
+      const state=await getState();
+      if(!state.graphics||typeof state.graphics!=="object")state.graphics={mvpName:"JOGADOR",mvpTeam:"",mvpPrize:"",introUntil:0,mvpUntil:0};
+      const isIntro=action==="intro"||action==="hideIntro";
+      const key=isIntro?"introUntil":"mvpUntil";
+      const duration=isIntro?8500:10000;
+      state.graphics[key]=action.startsWith("hide")?0:Date.now()+duration;
+      state.revision=Number(state.revision||0)+1;
+      await putState(state);
+      return send(res,200,{revision:state.revision,graphics:state.graphics,ok:true});
     }
     if(route==="upload/sign"&&req.method==="POST"){
       if(!isAuthorized(req))return fail(res,401,"Acesso administrativo: entre novamente.");

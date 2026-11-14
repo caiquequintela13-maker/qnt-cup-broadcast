@@ -1,6 +1,6 @@
 /* QNT CUP Central de Produção: sem framework, sem cloud, alterações via servidor local. */
 (() => {
-  let state=null, timer=null, busy=false, lastToast=null;
+  let state=null, timer=null, saveQueue=Promise.resolve(), lastToast=null;
   const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
   const PALETTE=['#25C9D8','#FF4655','#E9B765','#4A8BFF','#8B5CF6','#23B66E','#F2F2F2','#F59E0B','#EC4899','#9097A5'];
   const pages={
@@ -20,14 +20,28 @@
   function put(path,value){const bits=path.split('.');let ref=state;for(const k of bits.slice(0,-1))ref=ref[k];ref[bits.at(-1)]=value}
   function saveSoon(){if(!state)return;status('Aguardando gravação');clearTimeout(timer);timer=setTimeout(save,450)}
   async function api(route,options={}){const r=await fetch(route,{cache:'no-store',...options});let payload;try{payload=await r.json()}catch{payload={error:'Falha de resposta'}}if(!r.ok)throw Error(payload.error||('Erro HTTP '+r.status));return payload}
-  async function save(){if(!state)return;clearTimeout(timer);timer=null;
-    if(busy){saveSoon();return}
-    busy=true;status('Salvando...');
-    try{const out=await api('/api/state',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(state)});
-      state.revision=out.revision;status('Salvo automaticamente');
-    }catch(e){status('Erro ao salvar');toast(e.message,true)}finally{busy=false}
+  async function save(){
+    if(!state)return true;
+    if(timer){clearTimeout(timer);timer=null}
+    // Cada gravação entra em uma fila: uma requisição antiga nunca pode
+    // terminar depois de uma nova e sobrescrever o estado mais recente.
+    const snapshot=structuredClone(state);
+    status('Salvando...');
+    const task=saveQueue.catch(()=>{}).then(()=>api('/api/state',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(snapshot)}));
+    saveQueue=task.then(()=>undefined,()=>undefined);
+    try{
+      const out=await task;
+      state.revision=Math.max(Number(state.revision||0),Number(out.revision||0));
+      status('Salvo automaticamente');
+      return true;
+    }catch(e){status('Erro ao salvar');toast(e.message,true);return false}
   }
-  async function saveNow(){if(timer){clearTimeout(timer);timer=null}await save()}
+  async function saveNow(){
+    if(timer){clearTimeout(timer);timer=null}
+    await saveQueue;
+    const ok=await save();
+    if(!ok)throw Error('Não foi possível salvar os dados antes de acionar o banner. Verifique a conexão e tente novamente.');
+  }
   function logoPreview(id,url,fallback){const el=$('#'+id);el.replaceChildren();if(url){const img=document.createElement('img');img.src=url;img.alt='Logo';el.append(img)}else{el.textContent=fallback||'+'}}
   function renderSponsors(){
     const masters=$('#masters'),officials=$('#officials');masters.replaceChildren();officials.replaceChildren();
@@ -167,7 +181,16 @@
       apply(signed.publicUrl);await saveNow();toast('Logo aplicada com sucesso')
     }catch(e){status('Falha no envio');toast(e.message,true)}
   }
-  async function trigger(action){await saveNow();try{const d=await api('/api/trigger',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action})});state.revision=d.revision;toast(({intro:'Apresentação ao vivo',mvp:'MVP ao vivo',hideIntro:'Apresentação ocultada',hideMvp:'MVP ocultado'})[action])}catch(e){toast(e.message,true)}}
+  async function trigger(action){
+    try{
+      // Primeiro conclui todas as gravações do painel; só então dispara o gráfico.
+      await saveNow();
+      const d=await api('/api/trigger',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action})});
+      state.revision=Number(d.revision||state.revision||0);
+      if(d.graphics)state.graphics=structuredClone(d.graphics);
+      toast(({intro:'Apresentação ao vivo',mvp:'MVP ao vivo',hideIntro:'Apresentação ocultada',hideMvp:'MVP ocultado'})[action]);
+    }catch(e){toast(e.message,true)}
+  }
   function bind(){
     $$('.navbtn').forEach(x=>x.onclick=()=>tab(x.dataset.tab));
     $$('[data-veto-mode]').forEach(b=>b.onclick=()=>{if(state.veto?.history?.length&&!confirm('Trocar o formato reinicia o veto atual. Continuar?'))return;vetoAction('start',{mode:b.dataset.vetoMode})});

@@ -126,7 +126,7 @@
       const r=await fetch('/api/state',{cache:'no-store'});
       if(!r.ok)throw Error('Offline');
       const d=await r.json();
-      if(d.revision!==seenRevision){render(d);seenRevision=d.revision}
+      if(d.revision!==seenRevision){render(d);seenRevision=d.revision;tick()}
     }catch(e){ }
     finally{isPolling=false}
   }
