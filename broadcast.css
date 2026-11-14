@@ -1,0 +1,256 @@
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Barlow+Condensed:wght@400;500;600;700;800&display=swap');
+:root{--red:#ff4655;--gold:#ddb76b;--white:#f5f5f7;--ink:#090c13;--panel:rgba(8,11,18,.94);--a:#25c9d8;--b:#ff4655}
+*{box-sizing:border-box}
+html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:transparent;color:var(--white);font-family:'Barlow Condensed','Arial Narrow',Arial,sans-serif}
+body{position:relative}
+img{object-fit:contain}
+.brand-line{font-family:Rajdhani,sans-serif;text-transform:uppercase;letter-spacing:4px;font-weight:700}
+.kicker{text-transform:uppercase;letter-spacing:3.2px;font-weight:700;font-size:13px}
+.ghost{color:#a2a8b6}
+/* GAMEPLAY: caixa superior inspirada na geometria da versão do Claude, reduzida para preservar o jogo */
+#game-score{position:absolute;left:50%;top:62px;transform:translateX(-50%);display:flex;height:69px;filter:drop-shadow(0 9px 15px #0009);z-index:45}
+.team-panel{height:69px;display:flex;align-items:center;width:335px;padding:8px 19px;gap:12px;background:linear-gradient(125deg,rgba(14,18,29,.98),rgba(6,8,13,.94));position:relative;isolation:isolate}
+.team-panel.left{border-bottom:3px solid var(--a);clip-path:polygon(0 0,100% 0,95% 100%,0 100%);padding-right:29px}
+.team-panel.right{flex-direction:row-reverse;border-bottom:3px solid var(--b);clip-path:polygon(5% 0,100% 0,100% 100%,0 100%);padding-left:29px}
+.team-panel::before{content:'';position:absolute;top:0;height:2px;width:84%;background:linear-gradient(90deg,transparent,var(--a),transparent);opacity:.45}
+.team-panel.right::before{background:linear-gradient(90deg,transparent,var(--b),transparent)}
+.team-logo{width:49px;height:49px;flex:none;display:flex;align-items:center;justify-content:center;border:1px solid #ffffff35;background:#19202a;overflow:hidden;clip-path:polygon(12% 0,100% 0,100% 88%,88% 100%,0 100%,0 12%)}
+.team-logo img{width:43px;height:43px}
+.team-placeholder{font-size:25px;font-weight:800;color:#f3f3f3;text-shadow:0 0 12px #000}
+.team-text{min-width:0;flex:1}.team-panel.right .team-text{text-align:right}
+.team-title{font-size:24px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1;text-transform:uppercase;letter-spacing:.4px}
+.team-sub{font-size:12px;font-weight:700;letter-spacing:2.2px;opacity:.66;text-transform:uppercase;margin-top:4px}
+.map-count{font:700 35px/1 Rajdhani,sans-serif;min-width:29px;text-align:center}
+.team-panel.right .map-count{order:0}
+.center-brand{height:76px;margin:-3px -3px 0;min-width:135px;background:linear-gradient(145deg,#fe5362,#b92639);z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;clip-path:polygon(10% 0,90% 0,100% 14%,100% 88%,90% 100%,10% 100%,0 88%,0 14%);border-bottom:3px solid #fff6}
+.center-brand .brand-content{display:flex;align-items:center;justify-content:center;gap:5px;width:100%}
+.center-brand img{width:42px;height:40px;object-fit:contain;mix-blend-mode:multiply;filter:contrast(1.3)}
+.center-brand strong{font:800 24px/1 Rajdhani,sans-serif;letter-spacing:1.2px;color:#fff}
+.center-brand small{font:800 10px/1 Rajdhani,sans-serif;letter-spacing:2px;color:#fff;opacity:.88}
+#phase{position:absolute;top:13px;left:16px;z-index:40;min-width:188px;max-width:215px;background:rgba(8,10,17,.86);border-bottom:2px solid var(--red);padding:9px 13px 8px;clip-path:polygon(0 0,100% 0,94% 100%,0 100%)}
+#phase .small{font-size:10px;color:var(--red);font-weight:800;letter-spacing:2.3px}
+#phase .name{font-size:18px;font-weight:800;text-transform:uppercase;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#live{position:absolute;top:13px;right:17px;z-index:40;display:flex;gap:9px;align-items:center;background:rgba(8,10,17,.85);padding:9px 14px;border-bottom:2px solid var(--red);clip-path:polygon(0 0,100% 0,100% 100%,7% 100%)}
+#live .dot{height:8px;width:8px;background:var(--red);border-radius:50%;box-shadow:0 0 12px var(--red);animation:breathe 1.6s infinite}
+#live span{font-size:14px;letter-spacing:2px;font-weight:700}
+#bug{position:absolute;right:24px;bottom:102px;display:none;z-index:40;background:rgba(9,10,17,.85);padding:9px 16px;min-width:160px;max-width:220px;border-left:3px solid var(--gold);text-align:center}
+#bug .bug-label{color:var(--gold);font-size:10px;letter-spacing:2px}
+#bug img{display:block;max-width:148px;max-height:42px;margin:5px auto 0}
+#bug .sponsor-name{font-weight:800;font-size:20px;letter-spacing:.8px}
+#intro,#mvp{position:absolute;z-index:200;left:50%;top:48%;transform:translate(-50%,-44%) scale(.94);opacity:0;visibility:hidden;transition:transform .45s cubic-bezier(.2,.8,.2,1),opacity .45s ease,visibility .45s;pointer-events:none}
+#intro.show,#mvp.show{transform:translate(-50%,-50%) scale(1);opacity:1;visibility:visible}
+#intro .intro-box{background:linear-gradient(145deg,#16151eeF,#080a10fA);border:2px solid var(--red);padding:30px 55px;min-width:780px;clip-path:polygon(2% 0,98% 0,100% 13%,100% 87%,98% 100%,2% 100%,0 87%,0 13%);text-align:center;box-shadow:0 20px 80px #000}
+.intro-stage{color:var(--red);font-size:15px;font-weight:800;letter-spacing:5px;text-transform:uppercase}
+.intro-versus{display:flex;align-items:center;justify-content:center;gap:30px;margin:16px 0 10px}
+.intro-side{display:flex;flex-direction:column;align-items:center;width:300px}
+.intro-side img{width:104px;height:104px;margin-bottom:9px}
+.intro-side strong{font-size:39px;text-transform:uppercase;line-height:1.03}
+.intro-versus .vs{color:var(--red);font:800 34px Rajdhani,sans-serif;letter-spacing:2px}
+.intro-map{color:#cdd1db;letter-spacing:2.7px;font-size:16px;text-transform:uppercase}
+#mvp{top:72%}
+.mvp-box{min-width:650px;text-align:center;background:rgba(10,11,17,.96);border:2px solid var(--gold);clip-path:polygon(5% 0,95% 0,100% 50%,95% 100%,5% 100%,0 50%);padding:27px 80px;box-shadow:0 0 60px #000}
+.mvp-kicker{color:var(--gold);font-size:16px;letter-spacing:4px;font-weight:800}
+.mvp-name{font-size:54px;line-height:1.1;font-weight:800;text-shadow:0 0 18px #b5956530}
+.mvp-sub{color:var(--gold);font-size:20px;letter-spacing:2px}
+@keyframes breathe{50%{opacity:.43}}
+/* HUD VALORANT 4.2 — importante: 1920x1080 no OBS.
+  Areas nativas preservadas no modo LATERAL: minimapa (sup/esq),
+  cronometro e rounds (sup/centro), kill feed (sup/dir),
+  habilidades/arma/vida (inferior), e mira no centro.
+  Modo ESTUDIO: jogo em X=0,Y=108, 1536x864; os graficos ficam fora do jogo. */
+body.gameplay { isolation:isolate; }
+body.gameplay #broadcast-stack {
+  position:absolute;right:24px;top:345px;width:326px;
+  z-index:45;filter:drop-shadow(0 7px 15px rgba(0,0,0,.36));
+}
+body.gameplay .broadcast-status {
+  display:flex;justify-content:space-between;align-items:stretch;gap:8px;margin-bottom:5px;height:32px;
+}
+body.gameplay #phase,body.gameplay #live {position:relative;top:auto;right:auto;left:auto;bottom:auto;z-index:auto;
+  border:0;clip-path:none;max-width:none;min-width:0;margin:0;background:rgba(7,12,19,.87);
+  border-top:1px solid rgba(255,70,85,.7);padding:4px 11px 3px}
+body.gameplay #phase {display:flex;align-items:center;gap:9px;flex:1;overflow:hidden}
+body.gameplay #phase .small {font-size:10px;letter-spacing:1.4px;color:#ff7884;flex:none}
+body.gameplay #phase .name {font-size:15px;letter-spacing:.4px;overflow:hidden;text-overflow:ellipsis}
+body.gameplay #live {display:flex;gap:6px;align-items:center;justify-content:center;padding:4px 9px 3px}
+body.gameplay #live span {font-size:10px;font-weight:800;letter-spacing:1.5px;white-space:nowrap}
+body.gameplay #live .dot {width:6px;height:6px;flex:none}
+body.gameplay #game-score {position:relative;top:auto;left:auto;right:auto;transform:none;width:100%;height:auto;
+  display:flex;flex-direction:column;filter:none;margin:0;gap:3px}
+body.gameplay #game-score .center-brand {position:relative;top:auto;left:auto;transform:none;margin:0;
+  width:100%;min-width:0;height:59px;clip-path:none;border:1px solid rgba(255,255,255,.12);
+  border-left:3px solid var(--red);border-bottom:0;
+  background:linear-gradient(110deg,rgba(15,19,30,.96),rgba(8,11,20,.91));
+  padding:4px 12px;display:flex;flex-direction:row;align-items:center;justify-content:flex-start;gap:11px}
+body.gameplay .center-brand .brand-content {width:70px;height:48px;flex:0 0 70px;display:flex;align-items:center;justify-content:center}
+body.gameplay .center-brand img {width:64px;height:48px;object-fit:contain;mix-blend-mode:normal;filter:none}
+body.gameplay .brand-info {display:flex;flex-direction:column;justify-content:center;gap:3px;min-width:0}
+body.gameplay .brand-info strong {font:800 21px/1 Rajdhani,sans-serif;letter-spacing:2.5px;color:#fff}
+body.gameplay .brand-info small {font:700 11px/1 Rajdhani,sans-serif;letter-spacing:2px;color:#c6ccd5}
+body.gameplay .series-label {display:flex;justify-content:space-between;padding:3px 10px 1px;
+  font:700 10px/1.2 Rajdhani,sans-serif;letter-spacing:2.1px;color:#f3f3f4;text-shadow:0 1px 4px #000}
+body.gameplay .series-label span:last-child{color:#adb6c4}
+body.gameplay .team-panel,
+body.gameplay .team-panel.left,
+body.gameplay .team-panel.right {position:relative;left:auto;right:auto;top:auto;bottom:auto;
+  height:55px;width:100%;display:flex;flex-direction:row;align-items:center;gap:10px;
+  padding:7px 12px;clip-path:none;border:1px solid rgba(255,255,255,.10);border-left:3px solid var(--a);
+  border-bottom:1px solid rgba(255,255,255,.10);background:linear-gradient(110deg,rgba(12,17,27,.96),rgba(8,12,20,.89))}
+body.gameplay .team-panel.right{border-left:3px solid var(--b)}
+body.gameplay .team-panel::before{position:absolute;width:60%;height:1px;top:0;right:0;left:auto;opacity:.3}
+body.gameplay .team-logo {width:39px;height:39px;flex:0 0 39px;clip-path:polygon(11% 0,100% 0,100% 89%,89% 100%,0 100%,0 11%)}
+body.gameplay .team-logo img{width:36px;height:36px}
+body.gameplay .team-placeholder{font-size:22px}
+body.gameplay .team-text {min-width:0;flex:1;max-width:100%;text-align:left}
+body.gameplay .team-panel.right .team-text{text-align:left}
+body.gameplay .team-title {font-size:21px;line-height:1.05;letter-spacing:.15px}
+body.gameplay .team-sub {font-size:10px;letter-spacing:1.6px;line-height:1;margin-top:3px}
+body.gameplay .map-wrap {height:38px;min-width:39px;display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.075);border-radius:2px;border-top:2px solid var(--a)}
+body.gameplay .team-panel.right .map-wrap {border-top-color:var(--b)}
+body.gameplay .map-count {font:800 27px/1 Rajdhani,sans-serif;min-width:0;text-align:center}
+body.gameplay #bug {position:absolute;top:620px;right:24px;left:auto;bottom:auto;min-width:0;max-width:none;width:326px;
+  z-index:46;border:1px solid #dab16c55;border-left:3px solid var(--gold);
+  background:rgba(9,12,20,.9);padding:10px}
+body.gameplay #bug img{max-width:250px;max-height:42px}
+/* Modo arena: reserva faixa lateral de 384px e bandas superior/inferior de 108px.
+   O OBS precisa reduzir o gameplay para 1536x864, posicionado em (0,108). */
+body.gameplay[data-score-layout="estudio"]::before{
+  content:"";position:absolute;z-index:4;top:0;bottom:0;right:0;width:384px;pointer-events:none;
+  background:linear-gradient(150deg,rgba(30,9,20,.98),#090d16 44%,#070911);
+  border-left:2px solid rgba(255,70,85,.55);
+}
+body.gameplay[data-score-layout="estudio"]::after{
+  content:"";position:absolute;z-index:4;left:0;top:0;width:1536px;height:1080px;pointer-events:none;
+  background:linear-gradient(#090c14,#090c14) top/100% 108px no-repeat,
+             linear-gradient(#090c14,#090c14) bottom/100% 108px no-repeat;
+}
+body.gameplay[data-score-layout="estudio"] #broadcast-stack{
+  top:205px;right:28px;width:326px;filter:drop-shadow(0 9px 15px #000a)}
+body.gameplay[data-score-layout="estudio"] #studio-header,
+body.gameplay[data-score-layout="estudio"] #studio-bottom {display:flex}
+body.gameplay #studio-header,body.gameplay #studio-bottom{display:none;position:absolute;left:36px;right:416px;z-index:40;
+  align-items:center;justify-content:space-between;letter-spacing:3px;font:700 15px Rajdhani,sans-serif;color:#d1d3df}
+body.gameplay #studio-header{top:41px;height:25px}
+body.gameplay #studio-header span:first-child{font-size:26px;color:#fff;letter-spacing:5px}
+body.gameplay #studio-bottom{bottom:43px;height:20px;font-size:12px;color:#8993a6}
+body.gameplay[data-score-layout="estudio"] #bug {top:518px;right:28px;width:326px}
+body.gameplay[data-score-layout="estudio"] #intro {left:40%;top:50%}
+body.gameplay[data-score-layout="estudio"] #mvp {left:40%;top:74%}
+/* Grafico temporario: operadores devem exibir apenas nos intervalos de round.
+   Diferente do HUD persistente, estes banners sao propositadamente centrais. */
+
+/* INTERVALO */
+body.interval{background:radial-gradient(circle at 52% 27%,#32151d 0%,#0b0c13 35%,#05060b 72%)}
+body.interval::before{content:'';pointer-events:none;position:absolute;inset:0;background:repeating-linear-gradient(115deg,transparent 0,transparent 150px,#ff465507 151px,#ff465507 154px,transparent 155px,transparent 250px)}
+body.interval::after{content:'';pointer-events:none;position:absolute;inset:0;border:12px solid #ff465512;border-top:5px solid var(--red)}
+.stripe{position:absolute;width:540px;height:6px;background:linear-gradient(90deg,transparent,var(--red),transparent);transform:rotate(-22deg);opacity:.5}
+.stripe.s1{left:-190px;top:225px}.stripe.s2{right:-140px;bottom:360px}
+#break-top{position:absolute;top:35px;left:55px;right:55px;display:flex;justify-content:space-between;align-items:center}
+#break-top strong{font:800 22px Rajdhani,sans-serif;letter-spacing:5px;color:#fff}
+#break-top .stage{color:#f09aaa;font-size:18px;letter-spacing:3px;font-weight:700}
+.break-logo{position:absolute;left:50%;top:84px;transform:translateX(-50%);width:175px;height:175px;object-fit:contain;border-radius:8px;filter:drop-shadow(0 15px 26px #000)}
+.break-heading{position:absolute;left:50%;top:273px;transform:translateX(-50%);font-size:27px;letter-spacing:8px;font-weight:800;color:#eee;text-transform:uppercase;white-space:nowrap}
+.break-heading small{display:block;text-align:center;color:var(--red);font-size:14px;letter-spacing:6px;margin-bottom:9px}
+.break-match{position:absolute;left:50%;top:350px;transform:translateX(-50%);display:flex;align-items:center;gap:0;filter:drop-shadow(0 15px 35px #000)}
+.break-team{width:480px;height:190px;display:flex;gap:22px;align-items:center;background:linear-gradient(100deg,#1a202c,#0a0c14);padding:28px 32px;clip-path:polygon(0 0,100% 0,96% 100%,0 100%);border-bottom:5px solid var(--a)}
+.break-team.right{flex-direction:row-reverse;text-align:right;background:linear-gradient(270deg,#301b23,#0a0c14);clip-path:polygon(4% 0,100% 0,100% 100%,0 100%);border-color:var(--b)}
+.break-team .big-logo{width:125px;height:125px;display:flex;justify-content:center;align-items:center;flex:none;background:#ffffff09;border:1px solid #ffffff27;border-radius:10px}
+.break-team img{max-height:112px;max-width:112px}
+.break-team .no-logo{font-size:60px;font-weight:800}
+.break-team .name{font-size:37px;font-weight:800;line-height:1.05;max-width:260px;overflow:hidden;text-overflow:ellipsis;text-transform:uppercase}
+.break-team .tag{font-size:16px;letter-spacing:4px;color:#a6adbc;margin-top:10px}
+.break-vs{background:linear-gradient(155deg,#ff5967,#ba2e40);width:190px;height:190px;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:1;margin:0 -12px;clip-path:polygon(13% 0,87% 0,100% 50%,87% 100%,13% 100%,0 50%)}
+.break-vs .score{font:800 57px Rajdhani,sans-serif}
+.break-vs .format{font:700 17px Rajdhani,sans-serif;letter-spacing:4px}
+.break-vs .versus{font-size:13px;letter-spacing:3px;font-weight:800}
+.break-map{position:absolute;top:563px;left:50%;transform:translateX(-50%);font-size:20px;color:#aab2bf;letter-spacing:4px;text-transform:uppercase}
+.sponsor-area{position:absolute;bottom:49px;width:100%;padding:0 80px;text-align:center}
+.sponsor-area .heading{display:flex;align-items:center;gap:20px;justify-content:center;color:#d5c0a0;letter-spacing:4px;font-size:18px;font-weight:800;margin-bottom:15px}
+.sponsor-area .heading::before,.sponsor-area .heading::after{content:'';height:1px;width:180px;background:linear-gradient(90deg,transparent,#c59a59,transparent)}
+.sponsor-grid{display:flex;align-items:stretch;justify-content:center;gap:16px}
+.sponsor-card{display:flex;align-items:center;justify-content:center;flex-direction:column;background:linear-gradient(145deg,#181923,#0b0b11);min-height:75px;overflow:hidden;position:relative;padding:11px 20px;gap:5px}
+.sponsor-card img{max-width:100%;height:48px;object-fit:contain}
+.sponsor-card .name{font-size:22px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;line-height:1.1}
+.sponsor-card .caption{font-size:10px;letter-spacing:2px;color:#bcbac3;text-transform:uppercase}
+.master-grid .sponsor-card{width:370px;height:105px;border:1px solid #977243;border-top:3px solid var(--gold)}
+.master-grid .sponsor-card img{height:62px}
+.master-grid .sponsor-card .name{font-size:28px}
+.official-grid{margin-top:15px}
+.official-grid .sponsor-card{width:245px;height:78px;border:1px solid #454653;border-top:2px solid var(--red)}
+.official-grid .sponsor-card img{height:42px}
+.official-grid .sponsor-card .name{font-size:20px}
+.break-footer{position:absolute;bottom:13px;left:65px;right:65px;display:flex;justify-content:space-between;color:#717887;font-size:14px;letter-spacing:3px}
+
+/* V4.5: estado dos cinco jogadores de cada equipe, dentro do painel lateral existente */
+body.gameplay .roster-live{margin-top:8px;background:rgba(5,8,14,.94);border-top:2px solid var(--red);padding:5px 7px;box-shadow:0 12px 26px #0007}
+.live-roster-group{margin-bottom:6px}.live-roster-head{font:800 12px Rajdhani,Arial,sans-serif;letter-spacing:1.6px;text-transform:uppercase;color:#f5f5f7;border-left:3px solid var(--a);padding:3px 7px;background:#18202b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.live-roster-group.b .live-roster-head{border-left-color:var(--b)}
+.live-player{height:29px;margin-top:2px;display:flex;align-items:center;gap:8px;background:linear-gradient(90deg,#202530e8,#11131acc);border-right:2px solid #25c9d8;transition:filter .25s,background .25s}
+.live-roster-group.b .live-player{border-right-color:#ff4655}.live-face{width:32px;height:29px;flex:none;display:flex;align-items:center;justify-content:center;background:#273343;color:#b7dae1;font-weight:800;overflow:hidden;font-size:12px}
+.live-face img{width:100%;height:100%;object-fit:contain}.live-words{display:flex;align-items:center;gap:8px;min-width:0;flex:1}.live-words strong{font-size:14px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;flex:1}.live-words small{font-size:10px;letter-spacing:.5px;color:#aab1c0;flex:0 0 66px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.live-status{width:16px;color:#2ee7b7;font-size:12px}
+.live-player.dead{background:#17181c;color:#85858b;border-right-color:#666!important}.live-player.dead .live-face{filter:grayscale(1) brightness(.45)}.live-player.dead .live-words{filter:grayscale(1);opacity:.55}.live-player.dead .live-status{color:#ff4655}
+body.gameplay[data-score-layout="estudio"] .roster-live{margin-top:12px}
+
+/* V4.6 — HUD principal no estilo de transmissão oficial: placar no topo e rosters integrados */
+body.gameplay #official-hud{position:absolute;inset:0;z-index:45;pointer-events:none}
+body.gameplay #top-scorebar{position:absolute;left:50%;top:18px;transform:translateX(-50%);display:flex;align-items:stretch;gap:12px;filter:drop-shadow(0 12px 22px #000a)}
+body.gameplay #top-scorebar .score-team{width:392px;height:84px;display:flex;align-items:center;gap:14px;background:linear-gradient(145deg,rgba(14,18,29,.98),rgba(6,8,13,.94));padding:10px 18px;position:relative;overflow:hidden}
+body.gameplay #top-scorebar .score-team.left{clip-path:polygon(0 0,100% 0,95% 100%,0 100%);border-top:3px solid var(--a)}
+body.gameplay #top-scorebar .score-team.right{clip-path:polygon(5% 0,100% 0,100% 100%,0 100%);border-top:3px solid var(--b);justify-content:flex-end}
+body.gameplay #top-scorebar .score-team::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.03),transparent);pointer-events:none}
+body.gameplay #top-scorebar .team-logo{width:62px;height:62px;flex:none;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);border-radius:10px;overflow:hidden}
+body.gameplay #top-scorebar .team-logo img{width:90%;height:90%;object-fit:contain}
+body.gameplay #top-scorebar .team-text{min-width:0;flex:1}
+body.gameplay #top-scorebar .team-text.right{text-align:right}
+body.gameplay #top-scorebar .team-title{font-size:26px;font-weight:800;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:uppercase}
+body.gameplay #top-scorebar .team-sub{margin-top:4px;font:700 12px Rajdhani,sans-serif;letter-spacing:2px;color:#aeb7c7;text-transform:uppercase}
+body.gameplay #top-scorebar .map-count{width:68px;height:62px;display:flex;align-items:center;justify-content:center;background:#0b0f17;border:1px solid rgba(255,255,255,.12);font:800 43px Rajdhani,sans-serif}
+body.gameplay #top-scorebar .score-team.left .map-count{border-bottom:3px solid var(--a)}
+body.gameplay #top-scorebar .score-team.right .map-count{border-bottom:3px solid var(--b)}
+body.gameplay #top-scorebar .score-center{width:420px;min-height:84px;background:linear-gradient(180deg,rgba(16,21,33,.98),rgba(8,10,16,.95));border:1px solid rgba(255,255,255,.12);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:8px 14px;clip-path:polygon(4% 0,96% 0,100% 22%,100% 78%,96% 100%,4% 100%,0 78%,0 22%)}
+body.gameplay #top-scorebar .score-center-top{display:flex;gap:8px;align-items:center;justify-content:center;margin-bottom:6px;flex-wrap:wrap}
+body.gameplay .phase-pill,body.gameplay .live-pill{height:24px;padding:0 10px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;font:800 11px Rajdhani,sans-serif;letter-spacing:1.8px;text-transform:uppercase}
+body.gameplay .phase-pill{background:rgba(255,70,85,.16);border:1px solid rgba(255,70,85,.6);color:#ffd6da}
+body.gameplay .live-pill{background:rgba(20,23,31,.95);border:1px solid rgba(255,255,255,.12);color:#eef2fb}
+body.gameplay .live-pill .dot{width:7px;height:7px;border-radius:50%;background:#ff4655;box-shadow:0 0 10px #ff4655;margin-right:6px}
+body.gameplay #top-scorebar .score-brand{display:flex;align-items:center;gap:12px;text-align:center}
+body.gameplay #top-scorebar .score-brand img{width:42px;height:42px}
+body.gameplay #top-scorebar .score-brand strong{display:block;font:800 22px Rajdhani,sans-serif;letter-spacing:3px;color:#fff;line-height:1}
+body.gameplay #top-scorebar .score-brand small{display:block;margin-top:5px;font:700 11px Rajdhani,sans-serif;letter-spacing:2px;color:#b6c0cf;text-transform:uppercase}
+
+body.gameplay .roster-column{position:absolute;top:345px;width:350px;display:flex;flex-direction:column;gap:7px;filter:drop-shadow(0 12px 22px #0008)}
+body.gameplay .roster-column.left{left:24px}
+body.gameplay .roster-column.right{right:24px}
+body.gameplay .roster-head{height:54px;display:flex;align-items:center;justify-content:space-between;padding:8px 10px 8px 8px;background:linear-gradient(145deg,rgba(11,15,23,.98),rgba(6,9,15,.95));border:1px solid rgba(255,255,255,.1)}
+body.gameplay .roster-head.a{border-left:4px solid var(--a)}
+body.gameplay .roster-head.b{border-right:4px solid var(--b)}
+body.gameplay .roster-team{display:flex;align-items:center;gap:10px;min-width:0}
+body.gameplay .roster-badge{width:38px;height:38px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:8px;overflow:hidden;flex:none}
+body.gameplay .roster-badge img{width:88%;height:88%;object-fit:contain}
+body.gameplay .roster-title{min-width:0}.roster-title strong{display:block;font-size:18px;font-weight:800;line-height:1;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.roster-title small{display:block;margin-top:4px;color:#b8bfcc;font:700 11px Rajdhani,sans-serif;letter-spacing:1.6px}
+body.gameplay .roster-series-score{width:38px;height:38px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:#0d1219;border:1px solid rgba(255,255,255,.12);font:800 25px Rajdhani,sans-serif}
+body.gameplay .official-player{height:68px;display:flex;align-items:center;gap:10px;background:linear-gradient(145deg,rgba(16,22,34,.97),rgba(7,10,17,.94));border:1px solid rgba(255,255,255,.1);padding:7px 10px;overflow:hidden;position:relative}
+body.gameplay .official-player.a{border-left:4px solid var(--a)}
+body.gameplay .official-player.b{border-right:4px solid var(--b)}
+body.gameplay .official-player::before{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(255,255,255,.025),transparent)}
+body.gameplay .official-face{width:54px;height:54px;flex:none;display:flex;align-items:center;justify-content:center;background:#1a2330;border:1px solid rgba(255,255,255,.12);border-radius:8px;overflow:hidden;color:#d8dce5;font-weight:800;font-size:14px;text-transform:uppercase}
+body.gameplay .official-face img{width:100%;height:100%;object-fit:cover}
+body.gameplay .official-meta{min-width:0;flex:1;display:flex;flex-direction:column;justify-content:center}
+body.gameplay .official-meta strong{display:block;font-size:24px;line-height:1;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:none}
+body.gameplay .official-meta small{display:block;margin-top:4px;font:700 11px Rajdhani,sans-serif;letter-spacing:1.8px;color:#c2c9d6;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body.gameplay .official-state{min-width:64px;text-align:center;font:800 11px Rajdhani,sans-serif;letter-spacing:1.6px;color:#9df2db;text-transform:uppercase}
+body.gameplay .official-player.dead{background:linear-gradient(145deg,rgba(22,22,26,.96),rgba(10,10,12,.94));border-color:rgba(255,255,255,.06)}
+body.gameplay .official-player.dead.a,body.gameplay .official-player.dead.b{border-left-color:#555;border-right-color:#555}
+body.gameplay .official-player.dead .official-face{filter:grayscale(1) brightness(.42)}
+body.gameplay .official-player.dead .official-meta{filter:grayscale(1);opacity:.58}
+body.gameplay .official-player.dead .official-state{color:#ff98a0}
+body.gameplay .official-player.dead::after{content:'✕';position:absolute;right:10px;top:7px;font-size:16px;font-weight:800;color:#ff4655}
+
+body.gameplay #bug{position:absolute;right:24px;bottom:92px;top:auto;left:auto;min-width:0;max-width:none;width:350px;background:rgba(9,10,17,.9);border-left:3px solid var(--gold);padding:9px 15px;text-align:center}
+body.gameplay[data-score-layout="estudio"] .roster-column.right{right:24px}
+body.gameplay[data-score-layout="estudio"] .roster-column.left{left:24px}
+body.gameplay[data-score-layout="estudio"] #top-scorebar{top:24px}
+body.gameplay[data-score-layout="estudio"] #bug{right:24px;bottom:30px}
+body.gameplay[data-score-layout="estudio"] #studio-header,body.gameplay[data-score-layout="estudio"] #studio-bottom{display:flex}
+body.gameplay[data-score-layout="lateral"] #studio-header,body.gameplay[data-score-layout="lateral"] #studio-bottom{display:none}

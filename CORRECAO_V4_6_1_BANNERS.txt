@@ -1,0 +1,18 @@
+QNT CUP BROADCAST V4.6.1 — CORREÇÃO DOS BANNERS MVP E CONFRONTO
+
+O que foi corrigido:
+- As gravações automáticas do painel agora são serializadas em uma fila, evitando que uma gravação antiga sobrescreva o comando de exibição.
+- Ao clicar em Exibir apresentação ou Mostrar MVP, o painel aguarda a conclusão do salvamento antes de enviar o acionamento.
+- A API identifica explicitamente os campos de tempo do banner de confronto e do MVP e devolve a revisão/estado gráfico atualizado.
+- O overlay atualiza a apresentação imediatamente após receber uma nova revisão.
+
+Como publicar:
+1. Faça backup do projeto atual e do banco Supabase.
+2. Extraia este ZIP.
+3. Envie os arquivos para o mesmo repositório GitHub conectado à Vercel, substituindo os arquivos antigos.
+4. Faça um novo Deploy na Vercel.
+5. Não altere as variáveis de ambiente já configuradas.
+6. Abra /controle e /overlay no mesmo domínio. Atualize as duas páginas (Ctrl+F5).
+7. Na aba Banners e MVP, teste primeiro a apresentação e depois o MVP.
+
+Observação: este pacote preserva os arquivos, imagens e dados locais que vieram no ZIP V4.6. Os dados de produção continuam no Supabase; não execute novamente a migração inicial se o banco já estiver configurado.
