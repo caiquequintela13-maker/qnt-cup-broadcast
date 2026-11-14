@@ -1,0 +1,11 @@
+{
+  "name": "qnt-cup-broadcast",
+  "version": "4.6.0",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "jszip": "^3.10.1"
+  }
+}

@@ -1,0 +1,19 @@
+QNT CUP BROADCAST V4.6 — VERCEL + SUPABASE
+
+ARQUIVOS DE PUBLICAÇÃO:
+- api/[...path].js: API online
+- vercel.json: rotas públicas e configuração da função
+- package.json: dependência para backup ZIP
+- SUPABASE_SETUP.sql: tabela e buckets
+- migrate_to_supabase.py: migra estado e logos já existentes
+- DEPLOY_VERCEL_SUPABASE.md: passo a passo completo
+
+IMPORTANTE:
+1) Execute SUPABASE_SETUP.sql no SQL Editor do Supabase.
+2) Execute migrate_to_supabase.py com as variáveis do Supabase definidas.
+3) Envie o conteúdo desta pasta para um repositório GitHub privado.
+4) Importe o repositório na Vercel e configure as 4 variáveis descritas no manual.
+5) Não publique SUPABASE_SERVICE_ROLE_KEY.
+
+O arquivo INICIAR_QNT_CUP.bat e servidor.py continuam aqui para a cópia local original. Na Vercel, o servidor usado é a API Node em api/.
+Guarde o ZIP original V4.6 como backup separado.

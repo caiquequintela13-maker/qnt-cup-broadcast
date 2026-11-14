@@ -1,0 +1,48 @@
+{
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/controle.html"
+    },
+    {
+      "source": "/controle",
+      "destination": "/controle.html"
+    },
+    {
+      "source": "/overlay",
+      "destination": "/overlay.html"
+    },
+    {
+      "source": "/intervalo",
+      "destination": "/intervalo.html"
+    },
+    {
+      "source": "/veto",
+      "destination": "/veto.html"
+    },
+    {
+      "source": "/elencos",
+      "destination": "/elencos.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        }
+      ]
+    }
+  ],
+  "functions": {
+    "api/[...path].js": {
+      "maxDuration": 60
+    }
+  }
+}

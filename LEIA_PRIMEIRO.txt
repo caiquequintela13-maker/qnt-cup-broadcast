@@ -1,0 +1,106 @@
+QNT CUP — BROADCAST HUD V4.2 · VALORANT SAFE
+===============================================
+
+Este projeto atualiza a versão 4.1. A interface da transmissão preserva o HUD
+nativo do Valorant (minimapa, tempo/rounds, kill feed, habilidades, vida,
+arma/munição e mira). A tela de INTERVALO continua com os patrocinadores.
+
+REQUISITOS
+- Windows 10/11 com Python 3 (marque “Add Python to PATH” ao instalar).
+- OBS Studio / Streamlabs.
+- Não precisa instalar bibliotecas Python nem Spectra.
+
+COMEÇAR
+1. Extraia este ZIP numa pasta permanente, ex.: C:\QNT_CUP\HUD_V4_2.
+2. Se a versão 4.1 estiver aberta, feche-a antes (ambas usam a porta 8765).
+3. Clique INICIAR_QNT_CUP.bat e mantenha a janela do servidor aberta.
+4. Painel: http://127.0.0.1:8765/controle
+5. OBS — adicione DUAS FONTES DE NAVEGADOR, ambas 1920×1080:
+   PARTIDA:   http://127.0.0.1:8765/overlay
+   INTERVALO: http://127.0.0.1:8765/intervalo
+   Não marque “Arquivo local”. Na cena PARTIDA, a fonte de navegador deve
+   ficar ACIMA da Captura de jogo.
+
+ESCOLHA O LAYOUT EM “SISTEMA / BACKUP”
+
+A) LATERAL COMPETITIVO (padrão, não precisa alterar o OBS)
+   - Captura de jogo: tela cheia 1920×1080, como antes.
+   - O HUD aparece no lado direito, aproximadamente na área X=1570–1900 e
+     Y=345–580 do canvas de 1920×1080.
+   - Mantém livre a posição usual do kill feed, minimapa, score/tempo,
+     HUD de armas e mira. Ainda cobre uma pequena parte do cenário à direita.
+
+B) ARENA — ZERO SOBREPOSIÇÃO (mais limpo para um torneio)
+   - Reduza a CAPTURA DE JOGO no OBS para exatamente 1536×864.
+   - Na transformacao dessa fonte, defina posição X=0 e Y=108.
+   - O OBS precisa manter o canvas e a fonte Navegador em 1920×1080.
+   - O HUD ocupa a faixa à direita, fora da área de gameplay, sem cobrir o jogo.
+   - IMPORTANTE: sem redimensionar a Captura de jogo, a moldura vai cobrir o
+     gameplay, pois reserva fisicamente o espaço da interface.
+
+OBS: ao alternar de ARENA de volta para LATERAL, restaure a Captura de jogo
+para preencher 1920×1080; a fonte Navegador não muda.
+
+FUNCIONALIDADES PRESERVADAS
+- Controle dos times, nomes, logos, cores e mapas vencidos.
+- Seleção de fase, jogo/mapa, série MD1/MD3/MD5.
+- Gatilhos de apresentação e MVP (banners centrais temporários).
+- Patrocinadores na tela de intervalo, rotação opcional em gameplay.
+- Confrontos salvos, upload de logos e backup/restauração.
+
+IMPORTANTE
+- O placar deste overlay mede MAPAS VENCIDOS, e não rounds.
+- Tempo, rounds e agentes vêm diretamente do Valorant (não são substituídos).
+- Kill feed varia conforme o modo, resolução e configurações do jogo.
+- Recomenda-se exibir apresentação e MVP ENTRE ROUNDS, pois esses banners
+  temporários são propositadamente centrais.
+- Patrocinadores durante gameplay estão DESLIGADOS por padrão.
+- Faça o teste com uma partida real em 1920×1080 antes do torneio.
+- Se quiser importar configurações antigas, gere BACKUP ZIP na V4.1 e
+  restaure em “Sistema / backup” da V4.2.
+
+QNT CUP — 1ª EDIÇÃO | 14 E 15/11
+
+
+========================================================
+ NOVO NA V4.4 — VETO DE MAPAS / PICK & BAN
+========================================================
+Painel: http://127.0.0.1:8765/controle (aba Veto de mapas)
+Cena OBS: http://127.0.0.1:8765/veto (fonte Navegador 1920 x 1080)
+
+Map pool: Lotus, Summit, Sunset, Bind, Corrode, Abyss, Haven.
+A = primeiro time do confronto; B = segundo time.
+
+ATÉ SEMIFINAL:
+  - Escolha direta (MD1): A escolhe mapa, B escolhe lado.
+  - Bans alternados (MD1): A/B alternam seis bans; mapa restante
+    é escolhido automaticamente; B escolhe lado.
+  Escolha o formato na aba Veto antes de iniciar.
+
+GRANDE FINAL (MD3):
+  1) A bane um mapa; 2) B bane um mapa;
+  3) A escolhe mapa 1; 4) B escolhe lado no mapa 1;
+  5) B escolhe mapa 2; 6) A escolhe lado no mapa 2;
+  7) A bane um mapa; 8) B bane um mapa;
+  9) o último mapa disponível é o desempate (mapa 3).
+  O lado do desempate não é definido automaticamente.
+
+O painel permite desfazer a última decisão, reiniciar o veto,
+mostrar/ocultar a cena e aplicar um mapa ao placar principal.
+O estado fica salvo automaticamente em data/state.json e no backup.
+
+IMPORTANTE: a cena de veto é uma cena separada do gameplay.
+Não a sobreponha permanentemente à partida. Para usar, adicione
+uma fonte Navegador 1920x1080 com URL /veto e troque para essa
+cena durante o pick/ban. Depois volte para a cena do jogo.
+========================================================
+
+
+NOVO V4.6 — JOGADORES, AGENTES E ELIMINAÇÕES
+===========================================
+No painel: aba JOGADORES E AGENTES. Cadastre cada agente pelo nome e envie sua imagem PNG/JPG/WebP/GIF (até 8 MB). Depois configure os cinco nicks e agentes da Equipe A e os cinco da Equipe B.
+Durante o round clique ELIMINAR no jogador; a imagem fica cinza/escura e o status muda no HUD. Clique REVIVER para corrigir. O botão INICIAR NOVO ROUND reativa todos os 10 jogadores.
+Em Jogadores e Agentes ou Sistema, marque MOSTRAR JOGADORES NO GAMEPLAY para exibir a lista compacta dentro do painel lateral.
+Cena de escalações: http://127.0.0.1:8765/elencos (Fonte Navegador OBS, 1920 x 1080).
+Os arquivos de retratos enviados entram no backup. Ao salvar confronto, os 10 jogadores e seus agentes também ficam salvos.
+O modo ARENA evita cobrir o gameplay; no modo LATERAL a lista estendida ocupa parte da direita da imagem e pode cobrir detalhes do cenário.

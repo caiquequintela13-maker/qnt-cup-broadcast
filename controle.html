@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>QNT CUP • Central de Produção</title><link rel="stylesheet" href="/assets/controle.css"></head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand"><img src="/assets/qnt_logo.png" alt="QNT CUP"><div><div class="brand-title">QNT CUP</div><div class="brand-sub">CENTRAL DE PRODUÇÃO</div></div></div>
+    <div class="side-kicker">CONTROLE DA TRANSMISSÃO</div>
+    <nav>
+      <button class="navbtn active" data-tab="confronto"><span>◈</span> Confronto</button>
+      <button class="navbtn" data-tab="jogadores"><span>☷</span> Jogadores e agentes</button>
+      <button class="navbtn" data-tab="equipes"><span>⬡</span> Equipes e logos</button>
+      <button class="navbtn" data-tab="veto"><span>⌗</span> Veto de mapas</button>
+      <button class="navbtn" data-tab="patrocinadores"><span>★</span> Patrocinadores</button>
+      <button class="navbtn" data-tab="graficos"><span>▰</span> Banners e MVP</button>
+      <button class="navbtn" data-tab="salvos"><span>▣</span> Confrontos salvos</button>
+      <button class="navbtn" data-tab="sistema"><span>⚙</span> Sistema / backup</button>
+    </nav>
+    <div class="aside-bottom"><div class="connection"><span id="signal" class="signal"></span><span id="connectionLabel">Conectando ao HUD...</span></div><div class="small-hint">Roda localmente no seu PC.<br>Não depende de Spectra ou chave.</div></div>
+  </aside>
+  <main class="main">
+    <header class="topbar"><div><div class="eyebrow">BROADCAST MANAGEMENT / V4.6</div><h1 id="pageTitle">Confronto ao vivo</h1><p id="pageSub">Altere placar, mapa e fase. As mudanças aparecem no OBS.</p></div><div class="top-actions"><span id="saveStatus" class="save-status">● Carregando</span><a class="open-link" href="/overlay" target="_blank">Ver gameplay ↗</a><a class="open-link" href="/elencos" target="_blank">Ver escalações ↗</a><a class="open-link" href="/intervalo" target="_blank">Ver intervalo ↗</a><a class="open-link" href="/veto" target="_blank">Ver veto ↗</a></div></header>
+    <div class="panels">
+      <section class="tab visible" id="tab-confronto">
+        <div class="hint-card"><b>PLACAR DE MAPAS, NÃO DE ROUNDS.</b> O round e o cronômetro são exibidos pelo VALORANT. Não há cronômetro artificial cobrindo a partida.</div>
+        <div class="card"><div class="section-label">PLACAR DA SÉRIE</div><div class="score-layout"><div class="score-team"><span class="micro">EQUIPE A</span><strong id="scoreTeamA">EQUIPE A</strong><div class="score-controls"><button data-score="a:-1" class="outline">−</button><span id="scoreValueA">0</span><button data-score="a:1">+</button></div></div><div class="score-middle"><div>MAPAS</div><button class="outline small" id="resetScore">ZERAR PLACAR</button></div><div class="score-team right"><span class="micro">EQUIPE B</span><strong id="scoreTeamB">EQUIPE B</strong><div class="score-controls"><button data-score="b:-1" class="outline">−</button><span id="scoreValueB">0</span><button data-score="b:1">+</button></div></div></div></div>
+        <div class="card"><div class="section-label">DADOS DA PARTIDA</div><div class="form-grid"><label>Mapa atual<input data-path="event.map" placeholder="ASCENT"></label><label>Número do mapa<input data-path="event.mapNumber" type="number" min="1" max="9"></label><label>Número do confronto<input data-path="event.matchNumber" type="number" min="1" max="200"></label><label>Fase do torneio<input data-path="event.phase" placeholder="1ª RODADA"></label></div><div class="mini-label">FORMATO DA SÉRIE</div><div class="chip-row"><button class="chip" data-format="MD1">MD1</button><button class="chip" data-format="MD3">MD3</button><button class="chip" data-format="MD5">MD5</button></div><div class="mini-label">FASES RÁPIDAS</div><div class="chip-row"><button class="chip" data-phase="1ª RODADA">1ª rodada</button><button class="chip" data-phase="REPESCAGEM">Repescagem</button><button class="chip" data-phase="SEMIFINAL">Semifinal</button><button class="chip" data-phase="GRANDE FINAL">Grande final</button></div></div>
+      </section>
+
+      <section class="tab" id="tab-veto">
+        <div class="hint-card"><b>VETO OFICIAL QNT CUP</b> · Os nomes das equipes vêm da aba Equipes. O primeiro time do confronto é a Equipe A. As escolhas são transmitidas automaticamente na cena <b>/veto</b> do OBS.</div>
+        <div class="card"><div class="section-label">FORMATO DO VETO</div>
+          <div class="veto-mode-row"><button class="chip" data-veto-mode="md1">ATÉ SEMIFINAL · ESCOLHA DIRETA</button><button class="chip" data-veto-mode="md1_bans">ATÉ SEMIFINAL · BANS ALTERNADOS</button><button class="chip" data-veto-mode="final">GRANDE FINAL · MD3</button></div>
+          <p style="margin:16px 0 0">Escolha direta: Equipe A escolhe o mapa, Equipe B define o lado. Bans alternados: Equipe A começa banindo, alternando até sobrar um mapa; Equipe B define o lado. Grande final: dois bans, duas escolhas com lados invertidos, dois bans e desempate automático.</p>
+        </div>
+        <div class="card"><div class="veto-heading"><div><div class="section-label">SEQUÊNCIA DO VETO</div><h2 id="vetoTurn">Aguardando veto</h2><p id="vetoInstruction">Selecione um formato para começar.</p></div><div class="veto-counter" id="vetoCounter">0 / 0</div></div>
+          <div id="vetoChoices" class="veto-map-grid"></div><div id="vetoSides" class="veto-side-row"></div>
+          <div class="veto-toolbar"><button id="vetoUndo" class="outline">↶ Desfazer última ação</button><button id="vetoReset" class="outline">↻ Reiniciar veto</button><button id="vetoVisibility" class="outline">Ocultar cena de veto</button><a class="button" href="/veto" target="_blank">↗ Abrir cena no OBS</a></div>
+        </div>
+        <div class="card"><div class="section-label">RESULTADO · ORDEM DOS MAPAS</div><div id="vetoResults" class="veto-results"></div><div class="mini-label">HISTÓRICO DE DECISÕES</div><div id="vetoHistory" class="veto-history"></div></div>
+        <div class="card"><div class="section-label">FONTE NAVEGADOR PARA O OBS</div><code>http://127.0.0.1:8765/veto</code><p>Use 1920 × 1080 como uma cena separada de veto, antes de começar o jogo. A cena mostra o mapa selecionado, quem baniu ou escolheu e os lados definidos. O botão “Usar como mapa atual” atualiza também o placar do HUD.</p></div>
+      </section>
+      <section class="tab" id="tab-jogadores">
+        <div class="hint-card"><b>CONTROLE DE ELIMINAÇÕES EM TEMPO REAL.</b> Configure 5 jogadores por equipe, associe um agente com retrato personalizado e clique em <b>ELIMINAR / REVIVER</b> durante os rounds. Os retratos escurecem automaticamente no HUD e na cena de escalações.</div>
+        <div class="card"><div class="section-label">BIBLIOTECA DE AGENTES · RETRATOS PERSONALIZADOS</div>
+          <p>Cadastre o nome de cada agente e envie a imagem correspondente (PNG transparente recomendado, até 8 MB). A biblioteca permanece disponível para todos os confrontos; nenhum retrato é baixado automaticamente.</p>
+          <div class="button-row"><input id="agentNewName" placeholder="Ex.: Jett, Raze, Omen..."><button id="agentAdd">+ ADICIONAR AGENTE</button></div>
+          <div id="agentLibrary" class="agent-library"></div>
+        </div>
+        <div class="roster-toolbar card"><div class="section-label">CONTROLE AO VIVO</div><div class="button-row"><button id="reviveAll">↻ INICIAR NOVO ROUND · REVIVER TODOS</button><button class="outline" id="killAllA">Eliminar todos · Equipe A</button><button class="outline" id="killAllB">Eliminar todos · Equipe B</button></div>
+          <div class="switch-row"><label><input type="checkbox" data-path="settings.showRosters"> Mostrar jogadores no HUD oficial da transmissão</label></div>
+          <p>Os jogadores agora aparecem integrados ao HUD principal, em colunas laterais no estilo broadcast oficial. Use a cena <b>/elencos</b> quando quiser uma apresentação completa das escalações.</p>
+        </div>
+        <div class="roster-edit-grid"><div class="card"><div class="section-label" id="rosterTitleA">EQUIPE A · 5 JOGADORES</div><div id="rosterEditorA"></div></div>
+        <div class="card"><div class="section-label" id="rosterTitleB">EQUIPE B · 5 JOGADORES</div><div id="rosterEditorB"></div></div></div>
+        <div class="card"><div class="section-label">CENA DE ESCALAÇÕES PARA OBS</div><code>http://127.0.0.1:8765/elencos</code><p>Fonte Navegador 1920 × 1080. Ideal para intervalo, apresentação de equipes e acompanhamento de quem está vivo ou eliminado.</p></div>
+      </section>
+      <section class="tab" id="tab-equipes">
+        <div class="hint-card">Carregue as logos em PNG, JPG ou WebP. Os nomes, tags e logos serão aplicados tanto no gameplay quanto na tela de intervalo.</div>
+        <div class="teams-grid"><article class="card team-edit" data-side="a"><div class="section-label">EQUIPE A · LADO ESQUERDO</div><div class="logo-editor"><div id="previewLogoA" class="logo-preview">A</div><div><label class="upload-btn">ENVIAR LOGO A<input type="file" accept="image/png,image/jpeg,image/webp,image/gif" data-upload="team-a"></label><button class="text-danger remove-logo" data-remove="team-a">Remover logo</button></div></div><label>Nome da equipe<input data-path="teams.a.name" maxlength="34" placeholder="Nome completo"></label><label>TAG<input data-path="teams.a.tag" maxlength="9" placeholder="SIGLA"></label><div class="mini-label">COR DA EQUIPE A</div><div class="colors" data-colors="a"></div></article>
+        <article class="card team-edit" data-side="b"><div class="section-label">EQUIPE B · LADO DIREITO</div><div class="logo-editor"><div id="previewLogoB" class="logo-preview">B</div><div><label class="upload-btn">ENVIAR LOGO B<input type="file" accept="image/png,image/jpeg,image/webp,image/gif" data-upload="team-b"></label><button class="text-danger remove-logo" data-remove="team-b">Remover logo</button></div></div><label>Nome da equipe<input data-path="teams.b.name" maxlength="34" placeholder="Nome completo"></label><label>TAG<input data-path="teams.b.tag" maxlength="9" placeholder="SIGLA"></label><div class="mini-label">COR DA EQUIPE B</div><div class="colors" data-colors="b"></div></article></div><div class="card action-card"><button id="swapTeams" class="outline">⇄ Trocar lados A / B</button><button id="resetTeams" class="outline">Nova partida (zerar mapas)</button><span>As logos são mantidas quando você salva um confronto.</span></div>
+      </section>
+      <section class="tab" id="tab-patrocinadores"><div class="hint-card">Os <strong>2 masters</strong> aparecem maiores que os <strong>4 oficiais</strong> na cena de intervalo. A rotação durante os rounds fica desativada por padrão.</div><div class="section-label">★ PATROCINADORES MASTER</div><div id="masters" class="sponsors-grid masters"></div><div class="section-label" style="margin-top:25px">PATROCINADORES OFICIAIS</div><div id="officials" class="sponsors-grid officials"></div></section>
+      <section class="tab" id="tab-graficos"><div class="card"><div class="section-label">BANNER DE APRESENTAÇÃO</div><p>Exibe o confronto, as logos e o mapa por 8,5 segundos durante a transmissão.</p><div class="button-row"><button id="showIntro">▶ Exibir apresentação</button><button id="hideIntro" class="outline">✕ Ocultar</button></div></div><div class="card"><div class="section-label">★ MVP DA PARTIDA</div><div class="form-grid"><label>Nome do MVP<input data-path="graphics.mvpName" placeholder="Nome do jogador"></label><label>Equipe<input data-path="graphics.mvpTeam" placeholder="Nome do time"></label><label>Prêmio (opcional)<input data-path="graphics.mvpPrize" placeholder="Ex.: 400 VP"></label></div><div class="button-row"><button id="showMvp" class="gold">★ Mostrar MVP por 10s</button><button id="hideMvp" class="outline">✕ Ocultar</button></div></div></section>
+      <section class="tab" id="tab-salvos"><div class="card"><div class="section-label">SALVAR O CONFRONTO ATUAL</div><p>Guarde escalações de times e mapa para reutilizar ao longo dos dois dias. Patrocinadores ficam compartilhados entre todos os confrontos.</p><div class="button-row"><input id="presetName" placeholder="Ex.: Semifinal — KATARRENTOS x SNM"><button id="savePreset">+ Salvar confronto</button></div></div><div class="section-label">CONFRONTOS CADASTRADOS</div><div id="presetList"></div></section>
+      <section class="tab" id="tab-sistema"><div class="card"><div class="section-label">POSIÇÃO DO PLACAR (PREVIEW AO VIVO)</div>
+        <p><b>LATERAL COMPETITIVO:</b> exibe os dados da QNT CUP à direita, abaixo da área do kill feed, sem cobrir minimapa, rounds, cronômetro, mira, habilidades ou munição. Mantém o gameplay 1920×1080.</p>
+        <p><b>ARENA — ZERO SOBREPOSIÇÃO:</b> área exclusiva para o HUD no lado direito. Requer redimensionar a fonte Captura de jogo no OBS para <b>1536 × 864</b>, posição <b>X=0, Y=108</b>. A fonte Navegador continua 1920×1080.</p>
+        <div class="chip-row" role="group" aria-label="Layout do placar">
+          <button class="chip" data-layout="lateral">LATERAL COMPETITIVO (PADRÃO)</button>
+          <button class="chip" data-layout="estudio">ARENA · ZERO SOBREPOSIÇÃO</button>
+        </div>
+      </div>
+      <div class="card"><div class="section-label">EXIBIÇÃO NO GAMEPLAY</div><div class="switch-row"><label><input type="checkbox" data-path="settings.showRosters"> Mostrar jogadores e eliminações no HUD principal</label></div><div class="switch-row"><label><input type="checkbox" data-path="settings.showScoreboard"> Mostrar placar compacto (mapas)</label></div><div class="switch-row"><label><input type="checkbox" data-path="settings.showPhase"> Mostrar fase junto ao painel da QNT CUP</label></div><div class="switch-row"><label><input type="checkbox" data-path="settings.sponsorBug"> Rotacionar patrocinadores discretamente durante o jogo (28s masters / 14s oficiais)</label></div><p>Recomendação para gameplay competitivo: deixe a rotação desligada. A tela de intervalo exibe todos os patrocinadores.</p></div>
+      <div class="card"><div class="section-label">LINKS DO OBS</div><label>Fonte Navegador • HUD principal<code>http://127.0.0.1:8765/overlay</code></label><label>Fonte Navegador • escalações<code>http://127.0.0.1:8765/elencos</code></label><label>Fonte Navegador • intervalo<code>http://127.0.0.1:8765/intervalo</code></label><p>Ambas as fontes devem ser 1920 × 1080. Mantenha o servidor aberto. Em modo Arena, ajuste apenas a <b>Captura de jogo</b> para 1536×864 em (0,108).</p></div>
+      <div class="card"><div class="section-label">BACKUP</div><p>O backup ZIP inclui configurações, confrontos e logos enviadas. Guarde antes do evento.</p><div class="button-row"><a class="button" href="/api/backup" download="QNT_CUP_BACKUP.zip">↓ Baixar backup completo</a><label class="upload-btn">↑ Restaurar backup ZIP<input id="restoreFile" type="file" accept=".zip,application/zip"></label></div></div></section>
+    </div>
+  </main>
+</div>
+<div id="toast" role="status"></div>
+<script src="/assets/controle.js"></script>
+</body></html>
