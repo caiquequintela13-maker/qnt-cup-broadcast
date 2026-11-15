@@ -178,7 +178,7 @@
     status('Enviando logo...');
     busy++;
     try{
-      const signed=await api('/api/upload/sign',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:file.type})});
+      const signed=await api('/api/upload-sign',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:file.type})});
       const uploaded=await fetch(signed.uploadUrl,{method:'PUT',headers:{'Content-Type':file.type},body:file});
       if(!uploaded.ok)throw Error('O Supabase não conseguiu receber a imagem.');
       apply(signed.publicUrl);await saveNow();toast('Logo aplicada com sucesso')
@@ -228,7 +228,7 @@
     $('#restoreFile').onchange=async(ev)=>{const file=ev.target.files[0];if(!file)return;
       if(!confirm('Restaurar backup substitui as configurações e confrontos atuais. Continuar?'))return;
       try{
-        const signed=await api('/api/restore/sign',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({})});
+        const signed=await api('/api/restore-sign',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({})});
         const uploaded=await fetch(signed.uploadUrl,{method:'PUT',headers:{'Content-Type':'application/zip'},body:file});
         if(!uploaded.ok)throw Error('Não foi possível enviar o arquivo de backup ao Supabase.');
         await api('/api/restore',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({path:signed.path})});

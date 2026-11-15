@@ -145,7 +145,8 @@ async function restoreFromStorage(objectPath){
 async function handler(req,res){
   if(!ready())return fail(res,503,"Configure as variáveis do Supabase e as senhas na Vercel.");
   const pathname=new URL(req.url,"https://qnt.local").pathname;
-  const route=pathname.replace(/^\/api\/?/,"");
+  // Aceita também formas de 1 segmento (upload-sign, restore-sign, veto-view): rotas com "/" podem dar 404 no catch-all da Vercel.
+  const route=pathname.replace(/^\/api\/?/,"").replace(/-/g,"/");
   try{
     if(route==="health"&&req.method==="GET")return send(res,200,{status:"ok",time:Date.now()});
     if(route==="session"&&req.method==="GET")return send(res,200,{authenticated:isAuthorized(req)});
