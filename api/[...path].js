@@ -97,7 +97,8 @@ async function uploadBytes(bytes,type){
 async function signedUpload(bucket,objectPath){
   const encoded=objectPath.split("/").map(encodeURIComponent).join("/");
   const data=await sb(`/storage/v1/object/upload/sign/${bucket}/${encoded}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({})});
-  return {uploadUrl:SUPABASE_URL+data.url,token:new URL(data.url,SUPABASE_URL).searchParams.get("token")};
+  const rel=String(data.url||"");const full=/^https?:\/\//.test(rel)?rel:SUPABASE_URL+(rel.startsWith("/storage/v1")?rel:"/storage/v1"+rel);
+  return {uploadUrl:full,token:new URL(full).searchParams.get("token")};
 }
 function walkReplace(value,fn){
   if(Array.isArray(value)){for(let i=0;i<value.length;i++)value[i]=walkReplace(value[i],fn);return value;}
