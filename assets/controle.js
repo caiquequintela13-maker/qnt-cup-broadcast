@@ -1,6 +1,6 @@
 /* QNT CUP Central de Produção: sem framework, sem cloud, alterações via servidor local. */
 (() => {
-  let state=null, timer=null, saveQueue=Promise.resolve(), lastToast=null;
+  let state=null, timer=null, saveQueue=Promise.resolve(), lastToast=null, busy=0;
   const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
   const PALETTE=['#25C9D8','#FF4655','#E9B765','#4A8BFF','#8B5CF6','#23B66E','#F2F2F2','#F59E0B','#EC4899','#9097A5'];
   const pages={
@@ -27,6 +27,7 @@
     // terminar depois de uma nova e sobrescrever o estado mais recente.
     const snapshot=structuredClone(state);
     status('Salvando...');
+    busy++;
     const task=saveQueue.catch(()=>{}).then(()=>api('/api/state',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(snapshot)}));
     saveQueue=task.then(()=>undefined,()=>undefined);
     try{
@@ -35,6 +36,7 @@
       status('Salvo automaticamente');
       return true;
     }catch(e){status('Erro ao salvar');toast(e.message,true);return false}
+    finally{busy=Math.max(0,busy-1)}
   }
   async function saveNow(){
     if(timer){clearTimeout(timer);timer=null}
@@ -174,12 +176,14 @@
     const types=['image/png','image/jpeg','image/webp','image/gif'];
     if(!types.includes(file.type)){toast('Use PNG, JPG ou WebP',true);return}
     status('Enviando logo...');
+    busy++;
     try{
       const signed=await api('/api/upload/sign',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:file.type})});
       const uploaded=await fetch(signed.uploadUrl,{method:'PUT',headers:{'Content-Type':file.type},body:file});
       if(!uploaded.ok)throw Error('O Supabase não conseguiu receber a imagem.');
       apply(signed.publicUrl);await saveNow();toast('Logo aplicada com sucesso')
     }catch(e){status('Falha no envio');toast(e.message,true)}
+    finally{busy=Math.max(0,busy-1)}
   }
   async function trigger(action){
     try{
